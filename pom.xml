@@ -4,7 +4,7 @@
   <artifactId>persistent-queue</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Persistent Queue</name>
-  <description>Implementation of a persistente queue</description>
+  <description>Implementation of a persistent queue</description>
   <dependencies>
   	<dependency>
   		<groupId>commons-io</groupId>
