@@ -138,6 +138,18 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		}
 		return null;
 	}
+	
+	private E getById(long id) {
+		synchronized (pointer) {
+			if (id > pointer.get() && id <= counter.get()) {
+				String filename = filename(id);
+				File file = new File(queuePath, filename);
+				return persistence.readElement(file);				
+			} else {
+				throw new NoSuchElementException("ID: "+id);
+			}
+		}
+	}
 
 	private E getNextQueueElement() {
 		synchronized (pointer) {
@@ -201,13 +213,20 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		return getNextQueueElement();
 	}
 
-	// ====================== Not yet implemented
-	
-	public boolean contains(Object o) {
-		throw new NotImplementedException();
+	public boolean addAll(Collection<? extends E> c) {
+		for (E e : c) {
+			putElement(e);
+		}
+		return !c.isEmpty();
 	}
 
 	public Iterator<E> iterator() {
+		return new QueueIterator(counter.get());
+	}
+
+	// ====================== Not yet implemented
+	
+	public boolean contains(Object o) {
 		throw new NotImplementedException();
 	}
 
@@ -227,15 +246,34 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		throw new NotImplementedException();
 	}
 
-	public boolean addAll(Collection<? extends E> c) {
-		throw new NotImplementedException();
-	}
-
 	public boolean removeAll(Collection<?> c) {
 		throw new NotImplementedException();
 	}
 
 	public boolean retainAll(Collection<?> c) {
 		throw new NotImplementedException();
-	}	
+	}
+	
+	class QueueIterator implements Iterator<E> {
+		
+		private long id;
+		
+		QueueIterator(long pointer) {
+			this.id = pointer;
+		}
+
+		public boolean hasNext() {
+			return id > pointer.get();
+		}
+
+		public E next() {
+			E e = getById(id);
+			id--;
+			return e;
+		}
+
+		public void remove() {
+		}
+		
+	}
 }

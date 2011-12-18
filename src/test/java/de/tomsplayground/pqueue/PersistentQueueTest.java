@@ -1,10 +1,9 @@
 package de.tomsplayground.pqueue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
@@ -70,6 +69,19 @@ public class PersistentQueueTest {
 	public void testPeekOnEmptyQueue() {
 		Queue<String> queue = createQueue();
 		assertNull(queue.peek());
+	}
+	
+	@Test
+	public void testIteratorOnEmptyQueue() {
+		Queue<String> queue = createQueue();
+		Iterator<String> iterator = queue.iterator();
+		assertFalse(iterator.hasNext());
+		try {
+			iterator.next();
+			fail("Expected NoSuchElementException");
+		} catch (NoSuchElementException e) {
+			// Okay
+		}
 	}
 	
 	@Test
@@ -145,4 +157,45 @@ public class PersistentQueueTest {
 		assertEquals("two", queueWithSameDirectory.poll());
 		assertEquals("three", queueWithSameDirectory.poll());	
 	}
+	
+	@Test
+	public void testIterator() {
+		Queue<String> queue = createQueue();
+		queue.add("one");
+		queue.add("two");
+		queue.add("three");
+		Iterator<String> iterator = queue.iterator();
+		assertEquals("three" , iterator.next());
+		assertEquals("two" , iterator.next());
+		assertEquals("one" , iterator.next());
+	}
+	
+	@Test
+	public void testIteratorAndModifyQueue() {
+		Queue<String> queue = createQueue();
+		queue.add("one");
+		queue.add("two");
+		queue.add("three");
+		Iterator<String> iterator = queue.iterator();
+		queue.add("four");
+		
+		assertEquals("three" , iterator.next());
+		assertEquals("two" , iterator.next());
+		assertEquals("one" , iterator.next());
+	}
+	
+	@Test
+	public void testIteratorAndModifyQueue2() {
+		Queue<String> queue = createQueue();
+		queue.add("one");
+		queue.add("two");
+		queue.add("three");
+		Iterator<String> iterator = queue.iterator();
+		queue.poll();
+		
+		assertEquals("three" , iterator.next());
+		assertEquals("two" , iterator.next());
+		assertFalse(iterator.hasNext());
+	}
+
 }
